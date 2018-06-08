@@ -20,8 +20,8 @@ def shift_result_time(stime = '2018-05-27T17:00:00Z', tTZ = 8):
     return stime
 
 
-def smartdb_quary(host='54.254.253.188', port=8086, \
-                   password = 'root', user = 'root', \
+def smartdb_quary(host='127.0.01', port=8086, \
+                   password = 'xxx', user = 'xxx', \
                    dbname = 'SDB.basicRetention', \
                    Start_quary_time = '2018-05-27T00:00:00.000Z', \
                    End_quary_time =  '2018-05-28T01:00:00.000Z', \
