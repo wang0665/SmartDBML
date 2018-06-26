@@ -47,17 +47,15 @@ def smartdb_quary(host='127.0.01', port=8086, \
             '\"ChannelId\"=' + '\'' + Channel_quary + '\'' +  ' AND ' + \
             '\"DeviceId\"=' + '\'' + DeviceId_quary + '\'' + 'GROUP BY time(' + Group_quary + ')'
 
-
-    print("Host ip is: " + host)
-    print("Port is: " + str(port))
+    # Debug Print Only
+    # print("Host ip is: " + host)
+    # print("Port is: " + str(port))
 
     client = InfluxDBClient(host, port, user, password, dbname)
 
-    print("Querying data: " + query)
+    # Debug Print Only
+    # print("Querying data: " + query)
     Influxdb_result = client.query(query)
-
-    #print("Result: {0}".format(result))
-    #print(Influxdb_result)
 
     Influxdb_points = list(Influxdb_result.get_points(measurement = 'SecondlyReading'))
 
