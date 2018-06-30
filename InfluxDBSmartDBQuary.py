@@ -28,7 +28,8 @@ def smartdb_quary(host='127.0.01', port=8086, \
                    DeviceId_quary = '4177', \
                    Group_quary = '1m', \
                    Type_quary = 'RMSCurrent', \
-                   Q_Tzone = 8 \
+                   Q_Tzone = 8, \
+                   Print_Flag = 1 \                   
                    ):
     
     """Instantiate a connection to the InfluxDB."""
@@ -60,8 +61,9 @@ def smartdb_quary(host='127.0.01', port=8086, \
     Influxdb_points = list(Influxdb_result.get_points(measurement = 'SecondlyReading'))
 
     del Influxdb_result
-
-    print('Get %d data' %(len(Influxdb_points)))
+    
+    if Print_Flag == 1:
+        print('Get %d data' %(len(Influxdb_points)))
 
     Result_Array = [[0 for x in range(len(Influxdb_points))] for y in range(3)]
 
