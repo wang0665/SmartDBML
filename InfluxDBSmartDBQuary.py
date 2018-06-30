@@ -29,7 +29,7 @@ def smartdb_quary(host='127.0.01', port=8086, \
                    Group_quary = '1m', \
                    Type_quary = 'RMSCurrent', \
                    Q_Tzone = 8, \
-                   Print_Flag = 1 \                   
+                   Print_Flag = 1 \
                    ):
     
     """Instantiate a connection to the InfluxDB."""
