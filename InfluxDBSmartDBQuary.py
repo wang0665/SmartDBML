@@ -55,7 +55,8 @@ def smartdb_quary(host='127.0.01', port=8086, \
     client = InfluxDBClient(host, port, user, password, dbname)
 
     # Debug Print Only
-    # print("Querying data: " + query)
+    if Print_Flag == 1:
+        print("Querying data: " + query)
     Influxdb_result = client.query(query)
 
     Influxdb_points = list(Influxdb_result.get_points(measurement = 'SecondlyReading'))
