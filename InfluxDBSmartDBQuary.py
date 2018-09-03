@@ -77,9 +77,7 @@ def smartdb_quary(host='127.0.01', port=8086, \
     return Result_Array
 
 
-def smartdb_get_quary_language(host='127.0.01', port=8086, \
-                               password = 'xxx', user = 'xxx', \
-                               dbname = 'SDB.basicRetention', \
+def smartdb_get_quary_language(dbname = 'SDB.basicRetention', \
                                Start_quary_time = '2018-05-27T00:00:00.000Z', \
                                End_quary_time =  '2018-05-28T01:00:00.000Z', \
                                Channel_ID = 5, \
