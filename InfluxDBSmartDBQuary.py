@@ -77,6 +77,36 @@ def smartdb_quary(host='127.0.01', port=8086, \
     return Result_Array
 
 
+def smartdb_get_quary_language(host='127.0.01', port=8086, \
+                               password = 'xxx', user = 'xxx', \
+                               dbname = 'SDB.basicRetention', \
+                               Start_quary_time = '2018-05-27T00:00:00.000Z', \
+                               End_quary_time =  '2018-05-28T01:00:00.000Z', \
+                               Channel_ID = 5, \
+                               DeviceId_quary = '4177', \
+                               Group_quary = '1m', \
+                               Type_quary = 'RMSCurrent', \
+                               Q_Tzone = 8 \
+                               ):
+    
+    """Instantiate a connection to the InfluxDB."""
+    # SELECT mean("RMSCurrent") AS "mean_Val" FROM "SDB"."basicRetention"."SecondlyReading" WHERE time > '2018-05-31T00:00:00.000Z' AND time < '2018-05-31T01:00:00.000Z' AND "ChannelId"='3' AND "DeviceId"='4177' GROUP BY time(5m)
+
+    Channel_quary = str(Channel_ID)
+
+    Start_quary_time = shift_quary_time(Start_quary_time,Q_Tzone)
+    End_quary_time = shift_quary_time(End_quary_time,Q_Tzone)
+    
+
+
+    query = 'SELECT mean(\"' + Type_quary + '\") AS \"mean_Val\" FROM \"SDB\".\"basicRetention\".\"SecondlyReading\" WHERE ' + \
+            'time >' + '\'' + Start_quary_time + '\'' + ' AND ' + \
+            'time <' + '\'' + End_quary_time + '\'' +  ' AND ' + \
+            '\"ChannelId\"=' + '\'' + Channel_quary + '\'' +  ' AND ' + \
+            '\"DeviceId\"=' + '\'' + DeviceId_quary + '\'' + 'GROUP BY time(' + Group_quary + ')'
+
+    return query
+
 
 
 
