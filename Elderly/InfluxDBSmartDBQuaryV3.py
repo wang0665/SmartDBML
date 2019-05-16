@@ -26,7 +26,6 @@ def smartdb_Phaseshift_quary(host='127.0.01', port=8086, \
                    End_quary_time =  '2019-05-16T21:00:20.000Z', \
                    DeviceId_quary = '30099', \
                    Q_Tzone = 8, \
-                   Row_Number = 7, \
                    Print_Flag = 1 \
                    ):
     
@@ -35,51 +34,57 @@ def smartdb_Phaseshift_quary(host='127.0.01', port=8086, \
 
     Start_quary_time = shift_quary_time(Start_quary_time,Q_Tzone)
     End_quary_time = shift_quary_time(End_quary_time,Q_Tzone)
-    
-    query = 'SELECT '
+      
     Str_pixels = 'pixels'
     Str_pixels_as = 'P'
-    for i in range(8):
-        Str_pixels = 'pixels' + str(Row_Number * 8 + i)
-        Str_pixels_as = 'P' + str(Row_Number + 1) + str(i + 1)
-        query = query + ' \"' + Str_pixels + '\" as \"' + Str_pixels_as + '\"'
-        if i != 7:
-            query = query + ','
-    query = query + ' FROM ' + '\"SyntheticSen\".\"SyntheticSensorRetention\".\"AMG8833_R' + str(Row_Number + 1) + '\"' + \
-            ' WHERE (\"DeviceId\" = ' + '\'' + DeviceId_quary + '\') AND ' + \
-            'time >' + '\'' + Start_quary_time + '\'' + ' AND ' + \
-            'time <' + '\'' + End_quary_time + '\''
-
-
-    # Debug Print Only
-    # print("Host ip is: " + host)
-    # print("Port is: " + str(port))
-
+    
+    query_list = []
+    
+    for Row_Number in range(8):
+      query = 'SELECT '
+      for i in range(8):
+          Str_pixels = 'pixels' + str(Row_Number * 8 + i)
+          Str_pixels_as = 'P' + str(Row_Number + 1) + str(i + 1)
+          query = query + ' \"' + Str_pixels + '\" as \"' + Str_pixels_as + '\"'
+          if i != 7:
+              query = query + ','
+      query = query + ' FROM ' + '\"SyntheticSen\".\"SyntheticSensorRetention\".\"AMG8833_R' + str(Row_Number + 1) + '\"' + \
+              ' WHERE (\"DeviceId\" = ' + '\'' + DeviceId_quary + '\') AND ' + \
+              'time >' + '\'' + Start_quary_time + '\'' + ' AND ' + \
+              'time <' + '\'' + End_quary_time + '\''
+      query_list.append(query)
+     
     client = InfluxDBClient(host, port, user, password, dbname)
 
+    Influxdb_points_list = []
+    
     # Debug Print Only
     if Print_Flag == 1:
-        print("Querying data: " + query)
-    Influxdb_result = client.query(query)
-
-    Influxdb_points = list(Influxdb_result.get_points(measurement = ('AMG8833_R' + str(Row_Number + 1))))
+      for i in range(8): 
+        print("Querying data %d :" % (i+1) + query_list[i])
+        Influxdb_result = client.query(query_list[i])
+        Influxdb_points = list(Influxdb_result.get_points(measurement = ('AMG8833_R' + str(i + 1))))
+        Influxdb_points_list.append(Influxdb_points)
 
     del Influxdb_result
     
+    Data_Length = len(Influxdb_points_list[0])
+    
     if Print_Flag == 1:
-        print('Get %d data' %(len(Influxdb_points)))
-
-    Result_Array = [[0 for x in range(len(Influxdb_points))] for y in range(3)]
-
-    for i in range(0, len(Influxdb_points)):
-        Result_Array[0][i] = Influxdb_points[i]['P_val']
-        Result_Array[1][i] = Influxdb_points[i]['Q_val']
-        Result_Array[2][i] = Influxdb_points[i]['S_val']
-
-    del Influxdb_points
-    return Result_Array
-
-
-
-
-
+        print('Get %d data' % (Data_Length))
+    
+    res_pic_list = []
+    time_list = []
+    
+    for i in range(Data_Length):
+      temp_data = np.zeros((8,8))
+      for Row_Number in range(8):
+        for Column_Number in range(8):
+          data_str = 'P' + str(Row_Number + 1) + str(Column_Number + 1)
+          temp_data[Row_Number,Column_Number] = Influxdb_points_list[Row_Number][i][data_str]
+      temp_time = Influxdb_points_list[Row_Number][i]['time']
+      res_pic_list.append(temp_data)
+      time_list.append(temp_time)                    
+      
+        
+    return res_pic_list,time_list
