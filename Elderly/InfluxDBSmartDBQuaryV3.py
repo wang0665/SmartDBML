@@ -21,63 +21,63 @@ def shift_result_time(stime = '2018-05-27T17:00:00Z', tTZ = 8):
 
 def smartdb_Phaseshift_quary(host='127.0.01', port=8086, \
                    password = 'xxx', user = 'xxx', \
-                   dbname = 'SDB.basicRetention', \
                    Start_quary_time = '2018-05-27T00:00:00.000Z', \
                    End_quary_time =  '2018-05-28T01:00:00.000Z', \
-                   Channel_ID = 5, \
                    DeviceId_quary = '4177', \
-                   Group_quary = '1m', \
-                   P_threshold = -20, \
                    Q_Tzone = 8, \
+                   Row_Number = 0, \
                    Print_Flag = 1 \
                    ):
     
     """Instantiate a connection to the InfluxDB."""
-    # SELECT mean("RMSCurrent") AS "mean_Val" FROM "SDB"."basicRetention"."SecondlyReading" WHERE time > '2018-05-31T00:00:00.000Z' AND time < '2018-05-31T01:00:00.000Z' AND "ChannelId"='3' AND "DeviceId"='4177' GROUP BY time(5m)
-    # SELECT mean("RealPower") AS "mean_RealPower" FROM "SDB"."basicRetention"."SecondlyReading" WHERE RealPower < -800 AND time > :dashboardTime: AND "DeviceId"='8275' GROUP BY time(:interval:) FILL(null)
-    # SELECT mean("RealPower") AS "P_val", mean("ReactivePower") AS "Q_val", mean("ApparentPower") as "S_val" FROM "SDB"."basicRetention"."SecondlyReading" WHERE RealPower < -800 AND time > '2018-05-31T00:00:00.000Z' AND time < '2018-05-31T01:00:00.000Z' AND "ChannelId"='3' AND "DeviceId"='4177' GROUP BY time(5m)
-
+    # SELECT "pixels0" as "P11","pixels1" as "P12","pixels2" as "P13","pixels3" as "P14","pixels4" as "P15","pixels5" as "P16","pixels6" as "P17","pixels7" as "P18" FROM "SyntheticSensorRetention"."AMG8833_R1" WHERE ("DeviceId" = '30099') AND $timeFilter
     Channel_quary = str(Channel_ID)
 
     Start_quary_time = shift_quary_time(Start_quary_time,Q_Tzone)
     End_quary_time = shift_quary_time(End_quary_time,Q_Tzone)
     
-
-
-    query = 'SELECT mean(\"RealPower\") AS \"P_val\", mean(\"ReactivePower\") AS \"Q_val\", mean(\"ApparentPower\") as \"S_val\" FROM \"SDB\".\"basicRetention\".\"SecondlyReading\" WHERE ' + \
-            'RealPower <' + str(P_threshold) + ' AND ' + \
+    query = 'SELECT '
+    Str_pixels = 'pixels'
+    Str_pixels_as = 'P'
+    for i in range(8):
+        Str_pixels = 'pixels' + str(Row_Number * 8 + i)
+        Str_pixels_as = 'P' + str(Row_Number + 1) + str(i + 1)
+        query = query + ' \"' + Str_pixels + '\" as \"' + Str_pixels_as + '\"'
+        if i != 7:
+            query = query + ','
+    query = query + ' FROM ' + '\"SyntheticSen\".\"SyntheticSensorRetention\".\"AMG8833_R' + str(Row_Number + 1) + '\"' + \ 
+            ' WHERE (\"DeviceId\" = ' + '\'' + DeviceId_quary + '\') AND ' + \
             'time >' + '\'' + Start_quary_time + '\'' + ' AND ' + \
             'time <' + '\'' + End_quary_time + '\'' +  ' AND ' + \
-            '\"ChannelId\"=' + '\'' + Channel_quary + '\'' +  ' AND ' + \
-            '\"DeviceId\"=' + '\'' + DeviceId_quary + '\'' + 'GROUP BY time(' + Group_quary + ')'
+
 
     # Debug Print Only
     # print("Host ip is: " + host)
     # print("Port is: " + str(port))
 
-    client = InfluxDBClient(host, port, user, password, dbname)
+#     client = InfluxDBClient(host, port, user, password, dbname)
 
     # Debug Print Only
     if Print_Flag == 1:
         print("Querying data: " + query)
-    Influxdb_result = client.query(query)
+#     Influxdb_result = client.query(query)
 
-    Influxdb_points = list(Influxdb_result.get_points(measurement = 'SecondlyReading'))
+#     Influxdb_points = list(Influxdb_result.get_points(measurement = 'SecondlyReading'))
 
-    del Influxdb_result
+#     del Influxdb_result
     
-    if Print_Flag == 1:
-        print('Get %d data' %(len(Influxdb_points)))
+#     if Print_Flag == 1:
+#         print('Get %d data' %(len(Influxdb_points)))
 
-    Result_Array = [[0 for x in range(len(Influxdb_points))] for y in range(3)]
+#     Result_Array = [[0 for x in range(len(Influxdb_points))] for y in range(3)]
 
-    for i in range(0, len(Influxdb_points)):
-        Result_Array[0][i] = Influxdb_points[i]['P_val']
-        Result_Array[1][i] = Influxdb_points[i]['Q_val']
-        Result_Array[2][i] = Influxdb_points[i]['S_val']
+#     for i in range(0, len(Influxdb_points)):
+#         Result_Array[0][i] = Influxdb_points[i]['P_val']
+#         Result_Array[1][i] = Influxdb_points[i]['Q_val']
+#         Result_Array[2][i] = Influxdb_points[i]['S_val']
 
-    del Influxdb_points
-    return Result_Array
+#     del Influxdb_points
+#     return Result_Array
 
 
 
